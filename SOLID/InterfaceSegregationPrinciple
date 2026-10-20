@@ -1,0 +1,72 @@
+# Interface Segregation Principle
+This principle is the first principle that applies to Interfaces instead of classes in SOLID and it is similar to the Single Responsibility principle. It states that do not force any client to implement an interface which is irrelevant to them. Here your main goal is to focus on avoiding fat interface and give preference to many small client-specific interfaces. You should prefer many client interfaces rather than one general interface and each interface should have a specific responsibility.
+
+// Problematic approach that violates ISP
+interface Machine {
+  void print();
+  void scan();
+  void fax();
+}
+
+class AllInOnePrinter implements Machine {
+  @Override public void print() {
+    // Printing functionality
+  }
+  @Override public void scan() {
+    // Scanning functionality
+  }
+  @Override public void fax() {
+    // Fax functionality
+  }
+}
+
+class BasicPrinter implements Machine {
+  @Override public void print() {
+    // Printing functionality
+  }
+  @Override public void scan() {
+    // Problem: Basic printer can't scan!
+    throw new UnsupportedOperationException("Cannot scan");
+  }
+  @Override public void fax() {
+    // Problem: Basic printer can't fax!
+    throw new UnsupportedOperationException("Cannot fax");
+  }
+}
+
+In the above example, the BasicPrinter class is forced to implement methods for scanning and faxing, which it cannot support. This violates the Interface Segregation Principle because the class is burdened with irrelevant methods, leading to unnecessary complexity and potential runtime errors. When a class is required to implement methods that it does not need, it results in a bloated interface, making the class more difficult to understand and maintain. Additionally, the presence of unsupported methods can lead to runtime exceptions, as seen with the UnsupportedOperationException thrown by the scan() and fax() methods in the BasicPrinter class.
+
+// Better approach following ISP
+interface Printer {
+  void print();
+}
+
+interface Scanner {
+  void scan();
+}
+
+interface FaxMachine {
+  void fax();
+}
+
+class BasicPrinter implements Printer {
+  @Override
+  public void print() {
+    // Printing functionality
+  }
+}
+
+class AllInOnePrinter implements Printer, Scanner, FaxMachine {
+  @Override
+  public void print() {
+    // Printing functionality
+  }
+  @Override
+  public void scan() {
+    // Scanning functionality
+  }
+  @Override
+  public void fax() {
+    // Fax functionality
+  }
+}

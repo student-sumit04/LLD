@@ -1,0 +1,59 @@
+#  Open/Closed Principle
+This principle states that Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification which means you should be able to extend a class behavior, without modifying it.
+
+// Incorrect approach
+class Shape {
+ private
+  String type;
+ public
+  double calculateArea() {
+    if (type.equals("circle")) {
+      // Circle area calculation
+    } else if (type.equals("rectangle")) {
+      // Rectangle area calculation
+    }
+    // Adding a triangle requires modifying this method
+  }
+}
+In the above code example, the Shape class has multiple responsibilities: calculating the area for different shapes. This violates the Open/Closed Principle because adding a new shape, like a triangle, requires modifying the existing code. This can lead to potential bugs and makes the code harder to maintain. When a new shape is introduced, the calculateArea method must be updated to handle the new shape, which increases the risk of errors and makes the code less flexible. This approach tightly couples the Shape class to the specific shapes it supports, reducing its extensibility.
+
+
+// Better approach following Open/Closed Principle
+abstract class Shape {
+  abstract double calculateArea();
+  // We can also use an interface instead of an abstract class
+}
+
+class Circle extends Shape {
+ private
+  double radius;
+  @Override 
+  public double calculateArea() {
+    return Math.PI * radius * radius;
+  }
+}
+
+class Rectangle extends Shape {
+ private
+  double width;
+ private
+  double height;
+  @Override 
+  public double calculateArea() {
+    return width * height;
+  }
+}
+
+// Adding a new shape without modifying existing code
+class Triangle extends Shape {
+ private
+  double base;
+ private
+  double height;
+  @Override 
+  public double calculateArea() {
+    return 0.5 * base * height;
+  }
+}
+
+‍

@@ -1,0 +1,80 @@
+# Single Responsibility Principle‍
+This principle states that A class should have only one reason to change which means every class should have a single responsibility or single job or single purpose. In other words, a class should have only one job or purpose within the software system.
+
+// Class with multiple responsibilities
+class BreadBaker {
+ public
+  void bakeBread() { System.out.println("Baking high-quality bread..."); }
+
+ public
+  void manageInventory() { System.out.println("Managing inventory..."); }
+
+ public
+  void orderSupplies() { System.out.println("Ordering supplies..."); }
+
+ public
+  void serveCustomer() { System.out.println("Serving customers..."); }
+
+ public
+  void cleanBakery() { System.out.println("Cleaning the bakery..."); }
+
+ public
+  static void main(String[] args) {
+    BreadBaker baker = new BreadBaker();
+    baker.bakeBread();
+    baker.manageInventory();
+    baker.orderSupplies();
+    baker.serveCustomer();
+    baker.cleanBakery();
+  }
+}
+‍
+
+In the above code example, the BreadBaker class has multiple responsibilities: baking bread, managing inventory, ordering supplies, serving customers, and cleaning the bakery. This violates the Single Responsibility Principle (SRP) because the class has more than one reason to change. If any of these responsibilities need to be modified, the BreadBaker class would need to be changed, making the code harder to maintain and understand. For instance, if there is a change in the way inventory is managed, the BreadBaker class would need to be updated, even though the change is unrelated to baking bread. This coupling of unrelated responsibilities increases the risk of introducing bugs and makes the codebase more difficult to maintain.
+
+// Class for baking bread
+class BreadBaker {
+ public
+  void bakeBread() { System.out.println("Baking high-quality bread..."); }
+}
+
+// Class for managing inventory
+class InventoryManager {
+ public
+  void manageInventory() { System.out.println("Managing inventory..."); }
+}
+
+// Class for ordering supplies
+class SupplyOrder {
+ public
+  void orderSupplies() { System.out.println("Ordering supplies..."); }
+}
+
+// Class for serving customers
+class CustomerService {
+ public
+  void serveCustomer() { System.out.println("Serving customers..."); }
+}
+
+// Class for cleaning the bakery
+class BakeryCleaner {
+ public
+  void cleanBakery() { System.out.println("Cleaning the bakery..."); }
+}
+
+public class Bakery {
+ public
+  static void main(String[] args) {
+    BreadBaker baker = new BreadBaker();
+    InventoryManager inventoryManager = new InventoryManager();
+    SupplyOrder supplyOrder = new SupplyOrder();
+    CustomerService customerService = new CustomerService();
+    BakeryCleaner cleaner = new BakeryCleaner();
+    // Each class focuses on its specific responsibility
+    baker.bakeBread();
+    inventoryManager.manageInventory();
+    supplyOrder.orderSupplies();
+    customerService.serveCustomer();
+    cleaner.cleanBakery();
+  }
+}

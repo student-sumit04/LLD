@@ -1,0 +1,143 @@
+🔌Dependency Inversion Principle
+The Dependency Inversion Principle (DIP) is a principle in object-oriented design that states that High-level modules should not depend on low-level modules. Both should depend on abstractions. Additionally, abstractions should not depend on details. Details should depend on abstractions.
+
+In simpler terms, the DIP suggests that classes should rely on abstractions (e.g., interfaces or abstract classes) rather than concrete implementations. This allows for more flexible and decoupled code, making it easier to change implementations without affecting other parts of the codebase.
+
+‍
+// Problematic approach that violates DIP
+class EmailNotifier {
+  public void sendEmail(String message) {
+    // Configure SMTP
+    // Set up email templates
+    // Send email implementation
+  }
+}
+
+class OrderService {
+  private EmailNotifier emailNotifier;
+  private DatabaseLogger logger;
+  private InventorySystem inventory;
+  public OrderService() {
+    // Direct dependencies on concrete implementations
+    this.emailNotifier = new EmailNotifier();
+    this.logger = new DatabaseLogger();
+    this.inventory = new InventorySystem();
+  }
+  public void placeOrder(Order order) {
+    // Process order
+    inventory.updateStock(order);
+    emailNotifier.sendEmail("Order #" + order.getId() + " placed successfully");
+    logger.logTransaction("Order placed: " + order.getId());
+  }
+}
+
+
+ The OrderService class has direct dependencies on concrete implementations like EmailNotifier, DatabaseLogger, and InventorySystem. This design creates several challenges:
+
+‍
+
+1. Tight coupling to specific implementations: The OrderService class is tightly coupled to the specific implementations, making it difficult to change or replace them.
+
+‍
+
+2. Difficulty in unit testing due to concrete dependencies: Testing the OrderService class becomes challenging because it relies on concrete implementations.
+
+‍
+
+3. Inflexibility when business requirements change: Any change in the notification method or logging mechanism requires modifying the OrderService class.
+
+‍
+
+4. Challenges in maintaining and modifying the system: The code becomes harder to maintain and modify due to the tight coupling.
+
+‍
+
+5. Difficulty in implementing different notification strategies for different markets or customer segments: The system lacks flexibility to accommodate different notification methods.
+
+‍
+
+// Better approach following DIP
+interface NotificationService {
+  void sendNotification(String message);
+}
+
+interface LoggingService {
+  void logMessage(String message);
+  void logError(String error);
+}
+
+interface InventoryService {
+  void updateStock(Order order);
+  boolean checkAvailability(Product product);
+}
+
+class EmailNotifier implements NotificationService {
+  @Override
+  public void sendNotification(String message) {
+    // Email specific implementation
+  }
+}
+
+class SMSNotifier implements NotificationService {
+  @Override
+  public void sendNotification(String message) {
+    // SMS specific implementation
+  }
+}
+
+class PushNotifier implements NotificationService {
+  @Override
+  public void sendNotification(String message) {
+    // Push notification specific implementation
+  }
+}
+
+class DatabaseLogger implements LoggingService {
+  @Override
+  public void logMessage(String message) {
+    // Database logging implementation
+  }
+  @Override
+  public void logError(String error) {
+    // Error logging implementation
+  }
+}
+
+class OrderService {
+  private final NotificationService notificationService;
+  private final LoggingService loggingService;
+  private final InventoryService inventoryService;
+  // Constructor injection of dependencies
+  public OrderService(NotificationService notificationService,
+      LoggingService loggingService, InventoryService inventoryService) {
+    this.notificationService = notificationService;
+    this.loggingService = loggingService;
+    this.inventoryService = inventoryService;
+  }
+
+  public void placeOrder(Order order) {
+    try {
+      // Check inventory
+      if (inventoryService.checkAvailability(order.getProduct())) {
+        // Process order
+        inventoryService.updateStock(order);
+        // Send notification
+        notificationService.sendNotification(
+            "Order #" + order.getId() + " placed successfully");
+        // Log success
+        loggingService.logMessage(
+            "Order processed successfully: " + order.getId());
+      }
+    } catch (Exception e) {
+      loggingService.logError(
+          "Error processing order: " + order.getId() + " - " + e.getMessage());
+      throw e;
+    }
+  }
+}
+
+// Usage with dependency injection
+NotificationService emailNotifier = new EmailNotifier();
+LoggingService logger = new DatabaseLogger();
+InventoryService inventory = new WarehouseInventoryService();
+OrderService orderService = new OrderService(emailNotifier, logger, inventory);
