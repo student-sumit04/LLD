@@ -1,0 +1,199 @@
+The Builder Design Pattern is a creational design pattern that helps in constructing complex objects step-by-step. This pattern is especially useful when an object has many attributes or optional fields, allowing you to create different configurations of the object easily and clearly.
+
+‍
+
+Instead of using a constructor with many parameters (which can be cumbersome and error-prone), the Builder pattern allows you to separate the construction process from the final object. It allows you to build an object piece by piece, and the final product is assembled only when you call the build() method.
+
+In short, it’s a way to construct an object in a flexible, readable, and maintainable manner.
+
+
+Why Constructors?
+Constructors were introduced to ensure that objects are created in a valid state right when they are instantiated. The constructor allows you to initialize an object with necessary values and guarantees that all required properties are set up right away.
+
+Java
+public class Car {
+  private String engine;
+  private int wheels;
+  private int seats;
+  private String color;
+  private boolean sunroof;
+  private boolean navigationSystem;
+  public Car(String engine, int wheels, int seats, String color,
+    boolean sunroof, boolean navigationSystem) {
+      this.engine = engine;
+      this.wheels = wheels;
+      this.seats = seats;
+      this.color = color;
+      this.sunroof = sunroof;
+      this.navigationSystem = navigationSystem;
+    }
+  }
+‍
+
+While this approach works, as we can see, there are several drawbacks:
+Problem #1: Passing Unnecessary Values 🛑
+When you need to set optional attributes, such as sunroof or navigation system, you have to pass values for all parameters, even if they aren't necessary.
+
+Car car = new Car("V8", 4, 5, "Red", false, false); // The client needs to pass `false` for optional attributes
+‍
+
+Problem #2: Constructor Overloading and Huge Combinations ⚒️
+If a car has many optional attributes, you end up with multiple constructors, each for different combinations of parameters. This results in code duplication and leads to messy and unmanageable code.
+
+‍
+
+Java
+public class Car {
+  public Car(String engine, int wheels, int seats, String color,
+      boolean sunroof, boolean navigationSystem) {
+    ...
+  }
+  public Car(String engine, int wheels, int seats, String color) {
+    ...
+  }
+  public Car(String engine, int wheels, int seats) {
+    ...
+  }
+}
+‍
+
+The more attributes you add, the more combinations you have, leading to constructor bloat. Every time you add a new feature (like sports seats or a premium sound system), you need to add more constructors.
+
+‍
+
+Problem #3: Lack of Readability 📉
+The client code becomes hard to read because of unlabeled parameters in constructors. Here's a constructor that takes in multiple parameters, but it's hard to tell what each parameter represents:
+
+‍
+
+Java
+Car car = new Car("V8", 4, 5, "Red", true, false);
+
+
+
+Why is it Named the "Builder" Pattern? 🏗️
+
+The Builder Design Pattern is so named because it allows you to build an object step-by-step. The builder is responsible for assembling an object, and you control the process by setting attributes one by one. Instead of passing all parameters in a constructor, you pass only the ones you care about, and the builder takes care of the rest.
+
+‍
+
+How Does It Work?
+
+Let’s see how we can implement the Builder Pattern to create a Car with flexibility and clarity.
+
+‍
+
+
+public class Car {
+  private String engine;
+  private int wheels;
+  private int seats;
+  private String color;
+  private boolean sunroof;
+  private boolean navigationSystem;
+  // Car constructor should be private, ensuring it's only created through the
+
+  // builder
+  private Car(CarBuilder builder) {
+    this.engine = builder.engine;
+    this.wheels = builder.wheels;
+    this.seats = builder.seats;
+    this.color = builder.color;
+    this.sunroof = builder.sunroof;
+    this.navigationSystem = builder.navigationSystem;
+  }
+
+  // Getter methods for the fields
+  public String getEngine() {
+    return engine;
+  }
+  public int getWheels() {
+    return wheels;
+  }
+  public int getSeats() {
+    return seats;
+  }
+  public String getColor() {
+    return color;
+  }
+  public boolean hasSunroof() {
+    return sunroof;
+  }
+  public boolean hasNavigationSystem() {
+    return navigationSystem;
+  }
+  @Override
+  public String toString() {
+    return "Car [engine=" + engine + ", wheels=" + wheels + ", seats=" + seats
+        + ", color=" + color + ", sunroof=" + sunroof
+        + ", navigationSystem=" + navigationSystem + "]";
+  }
+
+  // CarBuilder nested class
+  public static class CarBuilder {
+    private String engine;
+    private int wheels = 4; // Default value
+    private int seats = 5; // Default value
+    private String color = "Black"; // Default value
+    private boolean sunroof = false; // Default value
+    private boolean navigationSystem = false; // Default value
+
+    // Builder methods to set attributes
+    public CarBuilder setEngine(String engine) {
+      this.engine = engine;
+      return this;
+    }
+    public CarBuilder setWheels(int wheels) {
+      this.wheels = wheels;
+      return this;
+    }
+    public CarBuilder setSeats(int seats) {
+      this.seats = seats;
+      return this;
+    }
+    public CarBuilder setColor(String color) {
+      this.color = color;
+      return this;
+    }
+    public CarBuilder setSunroof(boolean sunroof) {
+      this.sunroof = sunroof;
+      return this;
+    }
+    public CarBuilder setNavigationSystem(boolean navigationSystem) {
+      this.navigationSystem = navigationSystem;
+      return this;
+    }
+
+    // Build method to create a Car object
+    public Car build() {
+      return new Car(
+          this); // Return a new Car created using the builder's values
+    }
+  }
+}
+‍
+
+Client Code
+
+Here’s how the client would use the CarBuilder to create Car objects:
+
+
+public class Main {
+  public static void main(String[] args) {
+    // Creating a car using the Builder pattern
+    Car.CarBuilder builder = new Car.CarBuilder();
+    Car car1 = builder.setEngine("V8")
+                   .setColor("Red")
+                   .setSeats(5)
+                   .setSunroof(true)
+                   .build(); // The build method returns the final product
+    System.out.println(car1);
+
+    // Creating another car with different specifications
+    Car car2 = builder.setEngine("V6")
+                   .setColor("Blue")
+                   .setSeats(4)
+                   .build(); // Sunroof and Navigation are default
+    System.out.println(car2);
+  }
+}
