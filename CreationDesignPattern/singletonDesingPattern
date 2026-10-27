@@ -1,0 +1,99 @@
+Logger class:
+public class Logger {
+  public void log(String message) {
+    System.out.println("Log: " + message);
+  }
+}
+
+Application Class:
+  public class Application {
+    public void run() {
+        Logger logger = new Logger();  // New instance created every time
+        logger.log("Application started.");
+    }
+}
+
+
+The Problem: Multiple Instances of the Logger
+This approach seems to work fine at first. However, let’s stop and think for a second: What’s happening here every time we call the run() method?
+
+
+
+Each time the run() method is executed, a new Logger instance is created. This means that the application is constantly creating new instances of the logger, even though all these loggers are supposed to do the same job: log messages.
+
+
+
+Now, imagine that you have several classes in your application that need to log messages. For example, you might also have a UserService class that handles user actions like logging in:
+
+Java
+public class UserService {
+    public void login(String username) {
+        Logger logger = new Logger();  // Another new instance created
+        logger.log("User " + username + " logged in.");
+    }
+}
+
+
+In the UserService class, you are creating a new logger instance every time a user logs in.
+ So, now you have two loggers running in your application — one in Application and one in UserService.
+
+
+
+
+
+ Now, we introduce our savior: the Singleton Design Pattern. The Singleton pattern ensures that a class has only one instance and provides a global point of access to that instance. 🌍
+
+
+
+The Singleton Design Pattern is called "Singleton" because it ensures that a class has only one instance throughout the entire system, and it provides a global point of access to that instance.
+
+The word "single" in "Singleton" refers to the fact that the class will have only one instance,
+ no matter how many times it’s accessed or instantiated. The pattern guarantees that 
+ there is only one object of that class at any given time. 
+
+
+To put it simply, just like how a singleton (a person) is unique and exists only once in a specific context, 
+the Singleton pattern ensures that only one object of a certain class is created, and it’s used across the whole application. 
+
+
+
+Here’s how the Singleton works:
+
+1. We make the constructor private, so no one can directly instantiate the class. 
+
+2. We create a static instance of the class inside the class itself. 
+
+We provide a public static method (getInstance()) to return the single instance of the class. 
+
+
+
+Java
+public class Logger {
+  // 1. Private static variable to hold the single instance
+  private static Logger instance;
+
+  // 2. Private constructor to prevent instantiation
+  private Logger() {}
+
+  // 3. Public method to provide access to the instance
+  public static Logger getInstance() {
+    if (instance == null) {
+      instance = new Logger(); // Create a new instance only if it doesn't exist
+    }
+    return instance; // Return the existing instance
+  }
+  public void log(String message) {
+    System.out.println("Log: " + message);
+  }
+}
+
+public class Application {
+  public void run() {
+    // 4. Fetch the single instance of the Logger
+    Logger logger = Logger.getInstance();
+    logger.log("Application started.");
+  }
+}
+
+
+
